@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leader-Bewerbung - Nationale Garde</title>
+    <style>
+        :root {
+            --primary-dark: #0A0F14;
+            --primary-medium: #0a1410;
+            --primary-light: #0E3A2F;
+            --secondary-light: #8FA3A0;
+            --secondary-dark: #1D1D1D;
+            --accent-green: #17FF3D;
+            --accent-yellow: #FFCB2F;
+            --accent-red: #C22D2D;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background-color: #000;
+            color: var(--accent-green);
+            line-height: 1.4;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* CRT Screen Effects */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0.3;
+            overflow: hidden;
+        }
+        
+        .crt-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(23, 255, 61, 0.1) 0%, rgba(0,0,0,0) 70%);
+            z-index: 99;
+            pointer-events: none;
+        }
+        
+        .crt-curvature {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            box-shadow: 
+                inset 0 0 60px rgba(0, 0, 0, 0.9),
+                inset 0 0 20px rgba(0, 0, 0, 0.8);
+            z-index: 98;
+            pointer-events: none;
+        }
+        
+        /* TV Turn On Effect (CRT Start) */
+        .tv-turn-on { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; z-index: 1000; display: flex; justify-content: center; align-items: center; pointer-events: none; animation: tvFade 0.8s ease-in-out 2s forwards; }
+@keyframes tvFade { from { opacity:1; } to { opacity:0; display:none; } }
+
+        /* The thin horizontal scan line that expands vertically */
+        .tv-turn-on::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.95), rgba(23,255,61,0.9), rgba(255,255,255,0.95));
+            transform-origin: center;
+            transform: scaleY(0);
+            animation: crtLine 1.8s ease-in-out forwards, crtFlash 1.9s ease-in-out 0.18s forwards;
+        }
+
+        @keyframes crtLine {
+            0% { transform: scaleY(0); opacity: 1; top: 50%; }
+            20% { transform: scaleY(0.02); top: 45%; }
+            45% { transform: scaleY(1); top: 0%; }
+            70% { transform: scaleY(1); top: 0%; }
+            100% { transform: scaleY(1); top: 0%; opacity: 0; }
+        }
+
+        /* small white flash between 18% and 22% for that TV boot feel */
+        @keyframes crtFlash {
+            0% { box-shadow: none; }
+            10% { box-shadow: 0 0 40px rgba(255,255,255,0.95); }
+            30% { box-shadow: none; }
+            100% { box-shadow: none; display: none; }
+        }
+
+        /* persistent scan-wave that moves top-to-bottom */
+        .crt-overlay::before {
+            content: "";
+            position: absolute;
+            top: -120%;
+            left: 0;
+            width: 100%;
+            height: 120%;
+            background: linear-gradient(180deg, rgba(0,255,0,0.06) 0%, rgba(0,255,0,0.02) 40%, rgba(0,0,0,0) 70%);
+            transform: skewY(-6deg);
+            animation: scanMove 5s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes scanMove {
+            0% { top: -120%; }
+            100% { top: 120%; }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+            background-color: rgba(10, 15, 20, 0.7);
+            min-height: 100vh;
+            border-left: 1px solid rgba(23, 255, 61, 0.2);
+            border-right: 1px solid rgba(23, 255, 61, 0.2);
+            backdrop-filter: blur(1px);
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--accent-green);
+        }
+        
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin-right: 20px;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(0.8) contrast(1.2);
+        }
+        
+        .title {
+            flex: 1;
+        }
+        
+        .title h1 {
+            font-size: 24px;
+            color: var(--accent-green);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+        
+        .title p {
+            font-size: 16px;
+            color: var(--secondary-light);
+        }
+        
+        .content {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            color: var(--accent-green);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(23, 255, 61, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-green), transparent);
+            margin: 20px 0;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        
+        .info-box {
+            background-color: rgba(14, 58, 47, 0.2);
+            border: 1px solid rgba(23, 255, 61, 0.1);
+            padding: 10px;
+            transition: transform 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
+            will-change: transform;
+            overflow-wrap: anywhere;
+        }
+        
+        .info-box:hover { transform: translateY(-4px); box-shadow: 0 8px 30px rgba(0,0,0,0.6); background-color: rgba(23,255,61,0.04);} 
+        
+        .info-box h3 {
+            color: var(--accent-yellow);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .rank-structure {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .rank-category {
+            background-color: rgba(14, 58, 47, 0.2);
+            border: 1px solid rgba(23, 255, 61, 0.1);
+            padding: 10px;
+            transition: transform 180ms ease, box-shadow 180ms ease;
+            overflow: hidden;
+        }
+        
+        .rank-category:hover { transform: translateY(-3px); box-shadow: 0 6px 18px rgba(0,0,0,0.6);} 
+
+        .rank-category h3 {
+            color: var(--accent-yellow);
+            margin-bottom: 10px;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 203, 47, 0.3);
+            padding-bottom: 5px;
+        }
+        
+        .rank-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 6px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 12px;
+            align-items: center;
+            transition: transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+            cursor: default;
+            overflow-wrap: anywhere;
+        }
+        
+        .rank-item:last-child { border-bottom: none; }
+        
+        /* Hover for each rank item */
+        .rank-item:hover {
+            background-color: rgba(23,255,61,0.06);
+            transform: translateX(6px) scale(1.02);
+            text-shadow: 0 0 8px rgba(23,255,61,0.45);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+        }
+
+        .rank-number { font-weight: bold; color: var(--accent-green); min-width: 38px; text-align:left; }
+        .rank-name { color: var(--secondary-light); margin-left: 8px; word-break: break-word; }
+        
+        .department-list { margin-top: 15px; }
+        
+        .department-item { margin-bottom: 15px; padding:10px; transition: transform 160ms ease; overflow-wrap: anywhere; }
+        .department-item:hover { transform: translateY(-3px); }
+        
+        .department-item h3 { color: var(--accent-yellow); margin-bottom: 5px; font-size: 14px; }
+        
+        .exam-list { columns: 2; column-gap: 30px; margin-top: 10px; }
+        .exam-list li { margin-bottom: 8px; font-size: 13px; break-inside: avoid; }
+        
+        .closing { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(23, 255, 61, 0.3); }
+        .closing p { margin-bottom: 10px; }
+        .signature { margin-top: 20px; font-size: 16px; color: var(--accent-green); }
+        
+        /* Text Scanline Effect (made subtle) */
+        .content p, .content li { animation: textFlicker 0.25s infinite; }
+        @keyframes textFlicker { 0% { opacity: 0.97; } 50% { opacity: 1; } 100% { opacity: 0.98; } }
+
+        /* prevent overflowing text */
+        .content, .container, .rank-item, .info-box { word-break: break-word; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .rank-structure { grid-template-columns: 1fr; }
+            .exam-list { columns: 1; }
+            .container { padding: 10px; }
+        }
+            
+        /* Extra Glitch Effects */
+        .glitch {
+            position: relative;
+        }
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            opacity: 0.7;
+            clip-path: inset(0 0 0 0);
+        }
+        .glitch:hover::before {
+            left: 2px;
+            text-shadow: -2px 0 magenta;
+            animation: glitch1 0.3s infinite linear alternate-reverse;
+        }
+        .glitch:hover::after {
+            left: -2px;
+            text-shadow: -2px 0 cyan;
+            animation: glitch2 0.25s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch1 {
+            0% { clip-path: inset(0 0 80% 0); }
+            20% { clip-path: inset(10% 0 60% 0); }
+            40% { clip-path: inset(40% 0 40% 0); }
+            60% { clip-path: inset(60% 0 20% 0); }
+            80% { clip-path: inset(80% 0 0 0); }
+            100% { clip-path: inset(0 0 70% 0); }
+        }
+        @keyframes glitch2 {
+            0% { clip-path: inset(80% 0 0 0); }
+            20% { clip-path: inset(60% 0 10% 0); }
+            40% { clip-path: inset(40% 0 40% 0); }
+            60% { clip-path: inset(20% 0 60% 0); }
+            80% { clip-path: inset(0 0 80% 0); }
+            100% { clip-path: inset(10% 0 70% 0); }
+        }
+
+        /* Apply glitch to rank names */
+        .rank-name { position: relative; }
+        .rank-item:hover .rank-name { color: #17FF3D; text-shadow: 0 0 10px #17FF3D; }
+        .rank-item:hover .rank-name::before { content: attr(data-text); position: absolute; left: -2px; top: 0; color: magenta; opacity: .6; animation: glitch1 .4s infinite linear alternate; }
+        .rank-item:hover .rank-name::after { content: attr(data-text); position: absolute; left: 2px; top: 0; color: cyan; opacity: .6; animation: glitch2 .35s infinite linear alternate; }
+
+</style>
+</head>
+<body>
+    <!-- TV boot element: kept for accessibility but pointer-events none so page is usable -->
+    <div class="tv-turn-on" aria-hidden="true"></div>
+    
+    <div class="crt-overlay" aria-hidden="true"></div>
+    <div class="crt-glow" aria-hidden="true"></div>
+    <div class="crt-curvature" aria-hidden="true"></div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <img src="logo.png" alt="Nationale Garde Logo">
+            </div>
+            <div class="title">
+                <h1>Leader-Bewerbung</h1>
+                <p>Nationale Garde - Rheiner Easy</p>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <p>Sehr geehrtes Admin-Team,</p>
+                <p>hiermit bewerbe ich mich als Leader für die Nationale Garde.</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2 class="section-title">Inhaltsverzeichnis</h2>
+                <ol>
+                    <li>Informationen</li>
+                    <li>Warum ich Leader der Nationalen Garde werden will</li>
+                    <li>Vorschläge für besseres Rollenspiel in meiner Organisation</li>
+                    <li>Was zeichnet mich als Leader aus</li>
+                    <li>Konzept der Organisation</li>
+                    <li>Schlusswort</li>
+                </ol>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2 class="section-title">1. Informationen</h2>
+                
+                <div class="info-grid">
+                    <div class="info-box">
+                        <h3>OOC-Teil</h3>
+                        <ul>
+                            <li>Name: Luis</li>
+                            <li>Alter: 16</li>
+                            <li>Discord Name: Rheiner_Easy</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h3>IC-Teil</h3>
+                        <ul>
+                            <li>Name: Rheiner Easy</li>
+                            <li>ID: 289086</li>
+                            <li>Visum: 27</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2 class="section-title">2. Warum ich Leader der Nationalen Garde werden will</h2>
+                <p>Ich bin der Meinung, dass ich eine Organisation leiten kann. Ich habe gute und genug Erfahrung gesammelt, um eine komplette Organisation zu führen. All die Erfahrungen haben mir gezeigt, wie wichtig Struktur, Aktivität und Teamarbeit sind.</p>
+                <p>Deshalb bin ich mir sicher, dass ich bereit dafür bin, die Rolle als Leader zu übernehmen und die Nationale Garde nach vorne zu bringen.</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2 class="section-title">3. Vorschläge für besseres Rollenspiel in meiner Organisation</h2>
+                <p>Verbesserung und Überarbeitung der Prüfungen (siehe im Prüfungs-Tab).</p>
+                <p>Damit nicht jeder einfach die Prüfung easy schafft, wird die neue MTD, unsere Ausbildungsabteilung, die Prüfungen und Präsentationen überarbeiten!</p>
+                <p>Interne Orga-Events starten</p>
+                <p>Damit die Leute motiviert bleiben – z. B. Sniper vs. Gokart, Hide &amp; Seek oder andere Aktionen.</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2 class="section-title">4. Was zeichnet mich als Leader aus</h2>
+                <p>Ich habe über die Zeit viel Erfahrung gesammelt und war lange aktiv im State-Bereich. In der Zeit habe ich einiges mitgenommen und verstanden, wie eine Organisation laufen muss. Unter verschiedenen Orgas konnte ich viel lernen, vor allem, wie man Sachen ordentlich regelt und Struktur reinbringt.</p>
+                <p>Jetzt will ich den nächsten Schritt gehen. Ich bin überzeugt, dass ich das Zeug dazu habe, die Nationale Garde zu führen. Ich will mich beweisen und Verantwortung übernehmen.</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2 class="section-title">5. Konzept der Organisation</h2>
+                <h3>Rangstruktur der Nationalen Garde</h3>
+                
+                <div class="rank-structure">
+                    <div class="rank-category">
+                        <h3>Genstab</h3>
+                        <div class="rank-item">
+                            <span class="rank-number">30</span>
+                            <span class="rank-name">General of the Army - Leader</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">29</span>
+                            <span class="rank-name">Second General - Vize Leader</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">28</span>
+                            <span class="rank-name">Assistant General - Frei</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">27</span>
+                            <span class="rank-name">Advising General of NG - Curator einer Abteilung</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rank-category">
+                        <h3>Staboffiziere</h3>
+                        <div class="rank-item">
+                            <span class="rank-number">26</span>
+                            <span class="rank-name">Administration General - Stellv. Abteilungsleiter &amp; Abteilungsleiter für die MP</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">25</span>
+                            <span class="rank-name">General of Division - Abteilungsleiter für die AF, JSOC und MTD</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">24</span>
+                            <span class="rank-name">Ass. General of Division - Stellv. Abteilungsleiter für die AF, JSOC und MTD</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">23</span>
+                            <span class="rank-name">Senior Captain - Uprank nach Bewerbung/Leistung</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">22</span>
+                            <span class="rank-name">Captain - Uprank nach Bewerbung/Leistung</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">21</span>
+                            <span class="rank-name">Junior Captain - Uprank nach Bewerbung/Leistung</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rank-category">
+                        <h3>Abteilungsränge</h3>
+                        <div class="rank-item">
+                            <span class="rank-number">20</span>
+                            <span class="rank-name">Personal Manager - Abteilungsrang der MP</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">19</span>
+                            <span class="rank-name">Lieutenant - Abteilungsrang der AF, JSOC, MTD</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rank-category">
+                        <h3>Unteroffiziere</h3>
+                        <div class="rank-item">
+                            <span class="rank-number">18</span>
+                            <span class="rank-name">Lieutenant - Uprank nach Leistung</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">17</span>
+                            <span class="rank-name">Junior Lieutenant - Uprank nach Leistung</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">16</span>
+                            <span class="rank-name">Sergeant Major - Uprank nach Leistung</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">15</span>
+                            <span class="rank-name">Major - Uprank nach Leistung</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">14</span>
+                            <span class="rank-name">Junior Major - Uprank nach Leistung</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">13</span>
+                            <span class="rank-name">Veteran - Uprank nach Leistung</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">12</span>
+                            <span class="rank-name">Staff Sergeant - Uprank nach Leistung</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">11</span>
+                            <span class="rank-name">Sergeant - Uprank nach Leistung</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">10</span>
+                            <span class="rank-name">Staff Sergeant - Uprank nach Leistung</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rank-category">
+                        <h3>Soldat</h3>
+                        <div class="rank-item">
+                            <span class="rank-number">09</span>
+                            <span class="rank-name">Specialist - Ausstellung der Militär-ID</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">08</span>
+                            <span class="rank-name">Private First Class - GWD Note 1–2</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">07</span>
+                            <span class="rank-name">Private Second Class - GWD Note 3</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">06</span>
+                            <span class="rank-name">Private - GWD Note 4</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">05</span>
+                            <span class="rank-name">Recruit - GA Note 3 oder besser</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rank-category">
+                        <h3>Sonstige</h3>
+                        <div class="rank-item">
+                            <span class="rank-number">04</span>
+                            <span class="rank-name">Hausmeister - Frei/Platzhalter Rang</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">03</span>
+                            <span class="rank-name">Inactive/Vacation - Urlaub/inaktiv</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">02</span>
+                            <span class="rank-name">Suspended - Suspendiert</span>
+                        </div>
+                        <div class="rank-item">
+                            <span class="rank-number">01</span>
+                            <span class="rank-name">Cadet - Einstellungsrang</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3>Beitrittskriterien</h3>
+                <ul>
+                    <li>Visumstufe 2</li>
+                    <li>Straffreie Akte</li>
+                    <li>Waffenschein</li>
+                    <li>Aktivität</li>
+                    <li>Zustimmung und Wissen des Regelwerks</li>
+                    <li>Motivation</li>
+                </ul>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2 class="section-title">6. Abteilungen</h2>
+                
+                <div class="department-list">
+                    <div class="department-item">
+                        <h3>Military Police (MP)</h3>
+                        <p>Die Military Police ist für die Personalverwaltung innerhalb der NG zuständig. Zu ihren Kernaufgaben gehört unter anderem das Einstellen, Entlassen und Sanktionieren von Soldaten, sofern ein Fehlverhalten festgestellt wird. Die MP ist ebenfalls für die Pflege der Leitstelle und der dazugehörigen Personalakten zuständig.</p>
+                    </div>
+                    
+                    <div class="department-item">
+                        <h3>Air Force (AF)</h3>
+                        <p>Die Air Force ist die zuständige Abteilung, um die Luftüberlegenheit sicherzustellen sowie eine präzise Luftaufklärung zu gewährleisten. Ihre Hauptaufgaben umfassen das Aufräumen des Fort Zancudo nach erfolgten Überfällen, den Truppentransport (bei Events) und das Absolvieren von Patrouillenflügen über das Fort.</p>
+                    </div>
+                    
+                    <div class="department-item">
+                        <h3>Joint Special Operation Command (JSOC)</h3>
+                        <p>Die JSOC stellt die Eliteeinheit der Nationalgarde dar. Sie ist für die Bewältigung von hochgefährlichen Bedrohungen zuständig. Diese Spezialeinheit reagiert auf staatliche Notfälle wie Bombendrohungen und Gang-Razzien und agiert als Einsatzleitung bei Überfällen auf das Fort, den Flugzeugträger oder bei der Durchführung von Ghettostreifen.</p>
+                    </div>
+                    
+                    <div class="department-item">
+                        <h3>Military Training Department (MTD)</h3>
+                        <p>Die MTD dient als Ausbildungsabteilung und ist für den Grundwehrdienst sowie andere Ausbildungen zuständig. Zudem agiert die MTD als Ansprechpartner für Soldaten der Infanterie. Um die Soldaten der Nationalgarde auf dem bestmöglichen Wissensstand zu halten, werden die Prüfungen und Fortbildungen laufend aktualisiert.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2 class="section-title">7. Prüfungen</h2>
+                
+                <ul class="exam-list">
+                    <li>Rekrutierung (RK)</li>
+                    <li>Grundausbildung (GA)</li>
+                    <li>Torwachen-Schulung (TwS) (GWD Teil 1)</li>
+                    <li>Konvoi-Schulung (KS) (GWD Teil 2)</li>
+                    <li>Event-Schulung (ES) (GWD Teil 3)</li>
+                    <li>Erste-Hilfe-Kurs (EHK)</li>
+                    <li>Funk- und Leitstellen-Ausbildung (FUULA)</li>
+                    <li>Schießstandprüfung (SSP)</li>
+                    <li>Ortskunde &amp; Fahrsicherheitstraining (OK &amp; Fst)</li>
+                    <li>Flugtauglichkeit (FTK)</li>
+                    <li>Overwatch-Prüfung (OWP)</li>
+                    <li>Fallschirmjägerprüfung (FallJP)</li>
+                    <li>Einsatzleiter-Prüfung (EL)</li>
+                    <li>Ortskunde-Expert-Prüfung (OXP)</li>
+                    <li>Flugtauglichkeit Expert (FTKE) (freiwillig)</li>
+                </ul>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="section">
+                <h2 class="section-title">8. Schlusswort</h2>
+                <p>Vielen Dank fürs Durchlesen meiner Bewerbung. Ich hoffe, dass ich die Möglichkeit bekomme, mein Konzept auch persönlich vorzustellen.</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <div class="closing">
+                <p>Mit freundlichen Grüßen</p>
+                <p class="signature">Rheiner Easy</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
